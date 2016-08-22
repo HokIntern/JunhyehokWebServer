@@ -20,6 +20,7 @@ namespace JunhyehokWebServer
         HttpListenerContext listenerContext;
         int bytecount;
         int heartbeatMiss = 0;
+        public int initFailCounter = 0;
 
         private WebSocket webSocket;
         private char[] cookieChar;
@@ -122,7 +123,7 @@ namespace JunhyehokWebServer
                         }
 
                         // if Initialize_fail, it means the user came with a bad cookie
-                        if (respPacket.header.code == Code.INITIALIZE_FAIL)
+                        if (respPacket.header.code == Code.INITIALIZE_FAIL && initFailCounter == 5)
                         {
                             doSignout = true;
                             break; //close socket connection

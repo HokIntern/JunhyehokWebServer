@@ -33,7 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Junhaehok">
+    <Reference Include="Junhaehok, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Junhaehok\Junhaehok\bin\Release\Junhaehok.dll</HintPath>
     </Reference>
     <Reference Include="System" />

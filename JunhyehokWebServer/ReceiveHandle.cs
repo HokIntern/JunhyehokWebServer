@@ -195,12 +195,16 @@ namespace JunhyehokWebServer
                 Header backendReqHeader = new Header(Code.CONNECTION_PASS_SUCCESS, 0, client.UserId);
                 Packet backendReqPacket = new Packet(backendReqHeader, null);
                 backend.SendBytes(backendReqPacket);
+
+                client.initFailCounter = 0;
             }
             else
             {
                 returnData = null;
                 returnHeader = new Header(Code.INITIALIZE_FAIL, 0);
                 response = new Packet(returnHeader, returnData);
+
+                client.initFailCounter++;
             }
 
             return response;
@@ -766,12 +770,14 @@ namespace JunhyehokWebServer
             if (updateMMF)
                 UpdateMMF();
 
+            /*
             //===============Build Response/Set Surrogate/Return================
             if (debug && responsePacket.header.code != ushort.MaxValue && responsePacket.header.code != Code.HEARTBEAT && responsePacket.header.code != Code.HEARTBEAT_SUCCESS)
             {
                 Console.WriteLine("\n[Client] {0}:{1}", remoteHost, remotePort);
                 Console.WriteLine("==SEND: \n" + PacketDebug(responsePacket));
             }
+            */
 
             return responsePacket;
         }
