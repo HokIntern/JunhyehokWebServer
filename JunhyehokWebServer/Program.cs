@@ -70,7 +70,8 @@ namespace JunhyehokWebServer
 
             //===================CLIENT SOCKET ACCEPT===========================
             Console.WriteLine("Accepting clients...");
-            StartAcceptAsync("http://+:80/wsJinhyehok/");
+            string address = "http://+:" + clientPort + "/wsJinhyehok/";
+            StartAcceptAsync(address);
 
             //================READ MMF TO GET IPX COMMANDS======================
             while (true)

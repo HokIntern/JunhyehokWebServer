@@ -109,6 +109,7 @@ namespace JunhyehokWebServer
                             }
                         }
                     }
+                    client.Status = ClientHandle.State.Lobby;
                 }
 
                 bool clientExists = false;
@@ -133,6 +134,7 @@ namespace JunhyehokWebServer
                 lock (clients)
                     clients.Remove(client.UserId);
                 UpdateMMF();
+                client.Status = ClientHandle.State.Offline;
             }
             else
                 Console.WriteLine("ERROR: REMOVECLIENT - you messed up");
@@ -633,7 +635,7 @@ namespace JunhyehokWebServer
                 Console.WriteLine("==RECEIVED: \n" + PacketDebug(recvPacket));
             }
 
-            if (!HasInitialized())
+            if (!isBackend && !HasInitialized())
                 return new Packet(new Header(Code.INITIALIZE_FAIL, 0), null);
 
             switch (recvPacket.header.code)
@@ -729,7 +731,7 @@ namespace JunhyehokWebServer
                 //-----------SIGNOUT---------
                 case Code.SIGNOUT:
                     RemoveClient(client, true);
-                    responsePacket = new Packet(new Header(Code.SIGNOUT, 0), null);
+                    responsePacket = new Packet(new Header(Code.SIGNOUT_SUCCESS, 0), null);
                     break;
 
                 //---------UPDATE USER-------

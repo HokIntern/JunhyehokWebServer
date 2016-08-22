@@ -161,6 +161,12 @@ namespace JunhyehokWebServer
 
         public async void SendPacket(Packet packet)
         {
+            //===============Build Response/Set Surrogate/Return================
+            if (debug && packet.header.code != ushort.MaxValue && packet.header.code != Code.HEARTBEAT && packet.header.code != Code.HEARTBEAT_SUCCESS)
+            {
+                Console.WriteLine("\n[Client] {0}:{1}", remoteHost, remotePort);
+                Console.WriteLine("==SEND: \n" + PacketDebug(packet));
+            }
             byte[] bytes = PacketToBytes(packet);
             await webSocket.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), WebSocketMessageType.Binary, true, CancellationToken.None);
         }
