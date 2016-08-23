@@ -51,6 +51,10 @@ namespace JunhyehokWebServer
         }
         public ReceiveHandle(BackendHandle backend, Packet recvPacket)
         {
+            //should never to this.backend = backend
+            //because this constructor is shared with Agent
+            //and it is assumed that there is nothing to send back to agents
+            //so never do this.backend = backend
             this.client = null;
             this.recvPacket = recvPacket;
             updateMMF = false;
@@ -615,6 +619,20 @@ namespace JunhyehokWebServer
         {
             return ForwardPacketWithUserIdUpdated(recvPacket);
         }
+        //=========================================SERVER_STOP 1270=============================================
+        //=========================================SERVER_STOP 1270=============================================
+        //=========================================SERVER_STOP 1270=============================================
+        public Packet ResponseServerStop(Packet recvPacket)
+        {
+            if (IsAgent())
+            {
+                UpdateMMF(false);
+                backend.Shutdown(SocketShutdown.Both);
+                backend.Close();
+                Environment.Exit(0);
+            }
+            return NoResponsePacket;
+        }
 
         //=============================================SWITCH CASE============================================
         //=============================================SWITCH CASE============================================
@@ -760,6 +778,11 @@ namespace JunhyehokWebServer
                     responsePacket = ResponseDeleteUserFail(recvPacket);
                     break;
 
+                //--------SERVER STOP--------
+                case Code.SERVER_STOP:
+                    responsePacket = ResponseServerStop(recvPacket);
+                    break;
+
                 default:
                     if (debug)
                         Console.WriteLine("Unknown code: {0}\n", recvPacket.header.code);
@@ -808,8 +831,8 @@ namespace JunhyehokWebServer
             int roomCount = rooms.Count;
             AAServerInfoResponse aaServerInfoResp;
             aaServerInfoResp.alive = alive;
-            aaServerInfoResp.userCount = clientCount;
-            aaServerInfoResp.roomCount = roomCount;
+            aaServerInfoResp.userCount = alive == true ? clientCount : 0;
+            aaServerInfoResp.roomCount = alive == true ? roomCount : 0;
             byte[] aaServerInfoRespBytes = Serializer.StructureToByte(aaServerInfoResp);
 
             Console.WriteLine("[MEMORYMAPPED FILE] Writing to MMF: ({0})...", mmfName);
@@ -846,6 +869,12 @@ namespace JunhyehokWebServer
                 response = NoResponsePacket;
 
             return response;
+        }
+        private bool IsAgent()
+        {
+            if (null == client) //must not be a ClientHandle. Agents are backendHandles
+                return true;
+            return false;                
         }
     }
 }

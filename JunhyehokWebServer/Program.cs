@@ -50,6 +50,13 @@ namespace JunhyehokWebServer
                 }
             }
 
+            //=======================AGENT CONNECT================================
+            Console.WriteLine("Connecting to Agent...");
+            string agentInfo = "127.0.0.1:40000";
+            Socket agentSocket = Connect(agentInfo);
+            BackendHandle agent = new BackendHandle(agentSocket);
+            agent.StartSequence();
+
             //======================BACKEND CONNECT===============================
             Console.WriteLine("Connecting to Backend...");
             string backendInfo = "";
@@ -71,6 +78,27 @@ namespace JunhyehokWebServer
             //===================CLIENT SOCKET ACCEPT===========================
             Console.WriteLine("Accepting clients...");
             string address = "http://+:" + clientPort + "/wsJinhyehok/";
+
+            HttpListener listener = new HttpListener();
+            listener.Prefixes.Add(address);
+            listener.Start();
+
+            while (true)
+            {
+                HttpListenerContext listenerContext = listener.GetContext();
+                if (listenerContext.Request.IsWebSocketRequest)
+                {
+                    ClientHandle client = new ClientHandle(listenerContext);
+                    client.StartSequence();
+                }
+                else
+                {
+                    listenerContext.Response.StatusCode = 400;
+                    listenerContext.Response.Close();
+                }
+            }
+
+            /*
             StartAcceptAsync(address);
 
             //================READ MMF TO GET IPX COMMANDS======================
@@ -101,6 +129,7 @@ namespace JunhyehokWebServer
             backend.So.Shutdown(SocketShutdown.Both);
             backend.So.Close();
             Environment.Exit(0);
+            */
         }
         public static async void StartAcceptAsync(string listenerPrefix)
         {
@@ -110,6 +139,7 @@ namespace JunhyehokWebServer
 
             while (true)
             {
+                //HttpListenerContext listenerContext = listener.GetContext();
                 HttpListenerContext listenerContext = await HelperExtensions.GetContextAsync(listener);
                 if (listenerContext.Request.IsWebSocketRequest)
                 {
